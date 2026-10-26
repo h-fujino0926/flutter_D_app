@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://dglklmpcvyvinfoacyoz.supabase.co',
+    publishableKey: 'sb_publishable_jEDO1HSbf3F2VdARNEwFwg_SrPax1Gr',
+  );
+
   runApp(const MyApp());
 }
 
@@ -54,20 +62,43 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  
   int _counter = 0;
 
   void _incrementCounter() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       _counter++;
     });
   }
 
+  Future<void> _testSupabaseConnection() async {
+    try {
+      final result = await Supabase.instance.client
+          .from('team')
+          .select()
+          .limit(1);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Supabase接続成功！取得件数: ${result.length}'),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('接続テスト失敗: $e'),
+          duration: const Duration(seconds: 8),
+        ),
+      );
+    }
+  }
+
   @override
+
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
@@ -108,6 +139,11 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: _testSupabaseConnection,
+              child: const Text('Supabase接続テスト'),
             ),
           ],
         ),

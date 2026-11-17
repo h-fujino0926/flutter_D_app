@@ -1,0 +1,9 @@
+# コード生成（build_runner）の共通設定
+targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          # Dart の camelCase ⇔ DB の snake_case を自動変換する
+          field_rename: snake
+          explicit_to_json: true

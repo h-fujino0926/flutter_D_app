@@ -38,6 +38,7 @@ dependencies:
   window_manager: 0.5.2
   tray_manager: 0.5.3
   local_notifier: 0.1.6
+  screen_retriever: 0.2.2
 
   # その他
   table_calendar: 3.2.1
@@ -58,3 +59,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/tray_icon.ico

@@ -1,0 +1,51 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'router.dart';
+import 'theme.dart';
+
+/// アプリのルートウィジェット。
+class FusenApp extends ConsumerWidget {
+  const FusenApp({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return MaterialApp.router(
+      title: '付箋タスク',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.light(),
+      routerConfig: ref.watch(routerProvider),
+      locale: const Locale('ja'),
+      supportedLocales: const [Locale('ja')],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+    );
+  }
+}
+
+/// env.json が渡されずに起動されたときに出す画面。
+/// （チームメンバーが起動方法を間違えたときに原因がすぐ分かるように）
+class MissingEnvApp extends StatelessWidget {
+  const MissingEnvApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.light(),
+      home: const Scaffold(
+        body: Center(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: SelectableText(
+              '接続設定が読み込まれていません。\n\n'
+              '1. env.example.json をコピーして env.json を作成\n'
+              '2. 次のコマンドで起動してください\n'
+              '   flutter run -d windows --dart-define-from-file=env.json',
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

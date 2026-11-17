@@ -43,3 +43,13 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# ---- このプロジェクト独自 ----
+# 接続設定（各自で env.example.json をコピーして作る。コミットしない）
+env.json
+.env
+# Supabase CLI の一時ファイル
+supabase/.temp/
+supabase/.branches/
+# Supabase CLI を npm で入れた場合
+node_modules/

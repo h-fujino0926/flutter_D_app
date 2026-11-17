@@ -1,30 +1,22 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:flutter_d_app/main.dart';
+import 'package:flutter_d_app/app/app.dart';
+import 'package:flutter_d_app/features/board/presentation/board_page.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('env.json が無いときは設定エラー画面を表示する', (tester) async {
+    await tester.pumpWidget(const MissingEnvApp());
+    expect(find.textContaining('env.json'), findsWidgets);
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  testWidgets('ボード画面の骨組みが表示される', (tester) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    await tester.pumpWidget(const MaterialApp(home: BoardPage()));
+    expect(find.text('追加'), findsOneWidget);
+    expect(find.text('完'), findsOneWidget);
+    expect(find.text('ここにチームのタスクがまとめて表示'), findsOneWidget);
   });
 }

@@ -7,7 +7,7 @@
 -- =============================================================
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(18);
+select plan(20);
 
 create schema tests;
 grant usage on schema tests to authenticated;
@@ -148,6 +148,18 @@ select is(
 select throws_ok(
   $$select public.delete_task(tests.task_id())$$,
   'P0001', 'FORBIDDEN', '担当者でも作成者・リーダーでなければ削除できない');
+select tests.logout();
+
+-- ---- 18〜19. 担当者が自分を外して別の人に渡せる（アプリは「追加 → 削除」の順で行う） ----
+select tests.login_as('cccccccc-0000-0000-0000-000000000003');
+select lives_ok(
+  $$insert into public.task_members (task_id, user_id)
+    values (tests.task_id(), 'cccccccc-0000-0000-0000-000000000002')$$,
+  '担当者は別のメンバーを担当者に追加できる');
+select lives_ok(
+  $$delete from public.task_members
+    where task_id = tests.task_id() and user_id = 'cccccccc-0000-0000-0000-000000000003'$$,
+  'その後、自分を担当者から外せる');
 select tests.logout();
 
 select * from finish();

@@ -3,14 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/app.dart';
 import 'app/bootstrap.dart';
+import 'core/prefs/local_prefs.dart';
 
 /// 起動方法：
 ///   flutter run -d windows --dart-define-from-file=env.json
 Future<void> main() async {
-  final ready = await bootstrap();
-  if (!ready) {
+  final prefs = await bootstrap();
+  if (prefs == null) {
     runApp(const MissingEnvApp());
     return;
   }
-  runApp(const ProviderScope(child: FusenApp()));
+  runApp(
+    ProviderScope(
+      overrides: [localPrefsProvider.overrideWithValue(prefs)],
+      child: const FusenApp(),
+    ),
+  );
 }

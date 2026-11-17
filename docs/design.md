@@ -212,7 +212,36 @@ erDiagram
 | F6 配布 | Inno Setup でインストーラーを作る。署名なし（SmartScreen の警告は許容）。自動更新なし | |
 | 設定画面 | P1-09 の追加項目は未受領。受け取りしだい反映 | |
 
-## 5. 注意点（開発メンバー向け）
+## 5. 実装の状況
+
+| フェーズ | 状況 | 主なファイル |
+|---|---|---|
+| 0〜1 | ✅ | `supabase/migrations/`, `supabase/tests/` |
+| 2 認証 | ✅ | `lib/features/auth/` |
+| 3 チーム・ボード | ✅ | `lib/features/team/` |
+| 4〜5 付箋・D&D・同期 | ✅ | `lib/features/board/`, `lib/features/task/` |
+| 6 ゴミ箱・メッセージ・アイコン | ✅ | `task/presentation/trash_page.dart`, `task_detail_dialog.dart` |
+| 7 前回復元・プロフィール | ✅ | `team/presentation/home_resolver_page.dart`, `settings/` |
+| 8 招待 | ✅ | `invite/`, `team/presentation/team_dialogs.dart` |
+| 9 メンバー | ✅ | `team/presentation/team_manage_page.dart` |
+| 10 通知・レビュー | ✅ | `notification/`, `task_detail_dialog.dart` |
+| 11 ミニウィンドウ・トレイ | ✅ | `mini_window/` |
+| 12 見た目・カレンダー | ✅ | `board/presentation/widgets/sticky_note.dart`, `calendar/` |
+| 13 Googleカレンダー | ⏸ 未着手（着手前に相談） | — |
+| スマホ版（閲覧専用） | ✅（仮決定 E1） | `mobile/` |
+
+### 実装中に追加で決めたこと 🟡
+| 項目 | 内容 | 理由 |
+|---|---|---|
+| user_settings の保存 | upsert ではなく update | 行は登録時にトリガーで作られる。upsert だと user_id 列の UPDATE 権限が必要になり、列単位 GRANT で拒否されるため |
+| 担当者の付け替え | 「追加 → 削除」の順で実行 | 担当者が自分を外すとき、先に消すと操作権限がなくなり追加できないため |
+| ログイン状態保持の初期値 | 保持する（ON） | 毎回ログインする手間を減らすため |
+| 付箋のサイズ | S=140px / M=170px / L=210px（高さは幅の0.85倍） | |
+| ミニモードの見た目 | 不透明度 95%、タスクバー非表示、上部をドラッグで移動、幅40pxに折りたたみ | |
+| URL スキームの登録 | アプリ起動時に HKCU に登録（インストーラーでも登録） | zip 版でも招待URLを開けるように |
+| 通知の取りこぼし | 起動時と Realtime 再接続時に通知を取り直す | 7.4 の 5 |
+
+## 6. 注意点（開発メンバー向け）
 
 - **新しいテーブルを作ったら**：RLS を有効化し、`revoke all ... from anon, authenticated` → 必要な分だけ `grant`（Supabase が自動で全権限を付けるため）。
 - **新しい RPC を作ったら**：`revoke execute ... from public, anon` → `grant execute ... to authenticated`。

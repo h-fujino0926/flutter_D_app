@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/platform/platform_info.dart';
+import '../features/mini_window/presentation/desktop_shell.dart';
+import '../features/notification/application/notifications_controller.dart';
 import 'router.dart';
 import 'theme.dart';
 
@@ -11,6 +14,9 @@ class FusenApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // ログイン中はずっと自分宛ての通知を購読しておく（7.4 の 4）
+    ref.watch(notificationsProvider);
+
     return MaterialApp.router(
       title: '付箋タスク',
       debugShowCheckedModeBanner: false,
@@ -19,6 +25,10 @@ class FusenApp extends ConsumerWidget {
       locale: const Locale('ja'),
       supportedLocales: const [Locale('ja')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      builder: (context, child) {
+        final content = child ?? const SizedBox.shrink();
+        return PlatformInfo.isDesktop ? DesktopShell(child: content) : content;
+      },
     );
   }
 }

@@ -249,6 +249,16 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
+# デスクトップアプリなのでメール内リンクではなく 6桁コード（{{ .Token }}）を送る（7.9 / B16）
+# ※ クラウド（本番）ではダッシュボードの Authentication → Emails で同じ文面に変更すること（README 参照）
+[auth.email.template.recovery]
+subject = "【付箋タスク】パスワード再設定の確認コード"
+content_path = "./supabase/templates/recovery.html"
+
+[auth.email.template.confirmation]
+subject = "【付箋タスク】メールアドレスの確認コード"
+content_path = "./supabase/templates/confirmation.html"
+
 # Uncomment to customize email template
 # [auth.email.template.invite]
 # subject = "You have been invited"

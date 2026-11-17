@@ -7,7 +7,7 @@
 -- =============================================================
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(14);
+select plan(16);
 
 -- ---- テスト用ヘルパー（ロールバックで消える） ----
 create schema tests;
@@ -128,6 +128,24 @@ select tests.login_as('aaaaaaaa-0000-0000-0000-000000000002');
 select lives_ok(
   $$select public.leave_team((select team_id from public.teams where name = 'テストチームT'))$$,
   'member は退出できる');
+select tests.logout();
+
+-- ---- 14〜15. 前回のチームとして保存できるのは所属チームだけ ----
+create temp table t_ids on commit drop as
+  select team_id from public.teams where name = 'テストチームT';
+grant select on t_ids to authenticated;
+select tests.login_as('aaaaaaaa-0000-0000-0000-000000000001');
+select lives_ok(
+  $$update public.user_settings set last_team_id = (select team_id from t_ids)
+    where user_id = 'aaaaaaaa-0000-0000-0000-000000000001'$$,
+  '自分のチームは前回チームとして保存できる');
+select tests.logout();
+select tests.login_as('aaaaaaaa-0000-0000-0000-000000000003');
+select throws_ok(
+  $$update public.user_settings set last_team_id = (select team_id from t_ids)
+    where user_id = 'aaaaaaaa-0000-0000-0000-000000000003'$$,
+  '42501', null,
+  '所属していないチームは前回チームとして保存できない');
 select tests.logout();
 
 select * from finish();
